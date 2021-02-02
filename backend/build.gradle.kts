@@ -1,25 +1,23 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("java")
     id("org.springframework.boot") version "2.4.2"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     kotlin("jvm")
-    //kotlin("plugin.spring")
-    //kotlin("plugin.jpa")
+    kotlin("plugin.spring")
+    kotlin("plugin.jpa")
 }
 
 group = "de.iteratec.konfi"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    //implementation(kotlin("stdlib-jdk8"))
-    //implementation(kotlin("reflect"))
+    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("reflect"))
 
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
