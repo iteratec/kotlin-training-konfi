@@ -1,162 +1,178 @@
-package de.iteratec.konfi;
+package de.iteratec.konfi
 
-import org.json.JSONObject;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-
-import javax.transaction.Transactional;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.hamcrest.Matchers
+import org.json.JSONObject
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.MediaType
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.ResultActions
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import javax.transaction.Transactional
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class KonfiTest {
+class KonfiTest {
 
     @Autowired
-    private MockMvc mvc;
+    private val mvc: MockMvc? = null
 
     @Test
-    public void createAndList() throws Exception {
-        JSONObject json = createConferenceJson();
-
+    @Throws(Exception::class)
+    fun createAndList() {
+        val json = createConferenceJson()
         postJson("/conference", json)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", greaterThan(0)));
-
-        mvc.perform(get("/conference"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name", is(json.getString("name"))))
-                .andExpect(jsonPath("$[0].maxAttendees", is(json.getInt("maxAttendees"))))
-                .andExpect(jsonPath("$[0].startDate", is(json.getString("startDate"))))
-                .andExpect(jsonPath("$[0].endDate", is(json.getString("endDate"))));
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.greaterThan(0)))
+        mvc!!.perform(MockMvcRequestBuilders.get("/conference"))
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize<Any>(1)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].name", Matchers.`is`(json.getString("name"))))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].maxAttendees", Matchers.`is`(json.getInt("maxAttendees"))))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].startDate", Matchers.`is`(json.getString("startDate"))))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].endDate", Matchers.`is`(json.getString("endDate"))))
     }
 
     @Test
-    public void createInvalid() throws Exception {
-        JSONObject json = createConferenceJson();
-        postJson("/conference", json.put("name", null)).andExpect(status().isBadRequest());
-        postJson("/conference", json.put("name", "a")).andExpect(status().isBadRequest());
-        postJson("/conference", json.put("name", "a".repeat(60))).andExpect(status().isBadRequest());
-        postJson("/conference", json.put("maxAttendees", null)).andExpect(status().isBadRequest());
-        postJson("/conference", json.put("maxAttendees", -1)).andExpect(status().isBadRequest());
-        postJson("/conference", json.put("startDate", null)).andExpect(status().isBadRequest());
-        postJson("/conference", json.put("startDate", "1970-01-03 09:00:00")).andExpect(status().isBadRequest());
-        postJson("/conference", json.put("endDate", null)).andExpect(status().isBadRequest());
+    @Throws(Exception::class)
+    fun createInvalid() {
+        val json = createConferenceJson()
+        postJson("/conference", json.put("name", null)).andExpect(MockMvcResultMatchers.status().isBadRequest)
+        postJson("/conference", json.put("name", "a")).andExpect(MockMvcResultMatchers.status().isBadRequest)
+        postJson("/conference", json.put("name", "a".repeat(60))).andExpect(MockMvcResultMatchers.status().isBadRequest)
+        postJson("/conference", json.put("maxAttendees", null)).andExpect(MockMvcResultMatchers.status().isBadRequest)
+        postJson("/conference", json.put("maxAttendees", -1)).andExpect(MockMvcResultMatchers.status().isBadRequest)
+        postJson("/conference", json.put("startDate", null)).andExpect(MockMvcResultMatchers.status().isBadRequest)
+        postJson(
+            "/conference",
+            json.put("startDate", "1970-01-03 09:00:00")
+        ).andExpect(MockMvcResultMatchers.status().isBadRequest)
+        postJson("/conference", json.put("endDate", null)).andExpect(MockMvcResultMatchers.status().isBadRequest)
     }
 
     @Test
-    public void createColliding() throws Exception {
-        JSONObject json = createConferenceJson();
-        postJson("/conference", json).andExpect(status().isOk());
-        postJson("/conference", json).andExpect(status().isBadRequest());
+    @Throws(Exception::class)
+    fun createColliding() {
+        val json = createConferenceJson()
+        postJson("/conference", json).andExpect(MockMvcResultMatchers.status().isOk)
+        postJson("/conference", json).andExpect(MockMvcResultMatchers.status().isBadRequest)
     }
 
     @Test
-    public void register() throws Exception {
-        Long conferenceId = createConference(createConferenceJson());
-        JSONObject attendeeJson = createAttendeeJson();
-        MockHttpServletRequestBuilder registerRequest = post("/conference/{id}/attendees", conferenceId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(attendeeJson.toString());
-
-        mvc.perform(registerRequest).andExpect(status().isOk());
-        mvc.perform(get("/conference/{id}/attendees", conferenceId))
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].email", is(attendeeJson.getString("email"))))
-                .andExpect(jsonPath("$[0].firstName", is(attendeeJson.getString("firstName"))))
-                .andExpect(jsonPath("$[0].lastName", is(attendeeJson.getString("lastName"))));
+    @Throws(Exception::class)
+    fun register() {
+        val conferenceId = createConference(createConferenceJson())
+        val attendeeJson = createAttendeeJson()
+        val registerRequest = MockMvcRequestBuilders.post("/conference/{id}/attendees", conferenceId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(attendeeJson.toString())
+        mvc!!.perform(registerRequest).andExpect(MockMvcResultMatchers.status().isOk)
+        mvc.perform(MockMvcRequestBuilders.get("/conference/{id}/attendees", conferenceId))
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize<Any>(1)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].email", Matchers.`is`(attendeeJson.getString("email"))))
+            .andExpect(
+                MockMvcResultMatchers.jsonPath(
+                    "$[0].firstName",
+                    Matchers.`is`(attendeeJson.getString("firstName"))
+                )
+            )
+            .andExpect(
+                MockMvcResultMatchers.jsonPath(
+                    "$[0].lastName",
+                    Matchers.`is`(attendeeJson.getString("lastName"))
+                )
+            )
     }
 
     @Test
-    public void registerInvalidAttendee() throws Exception {
-        Long conferenceId = createConference(createConferenceJson());
-        JSONObject attendeeJson = createAttendeeJson().put("email", "a");
-        MockHttpServletRequestBuilder registerRequest = post("/conference/{id}/attendees", conferenceId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(attendeeJson.toString());
-
-        mvc.perform(registerRequest).andExpect(status().isBadRequest());
+    @Throws(Exception::class)
+    fun registerInvalidAttendee() {
+        val conferenceId = createConference(createConferenceJson())
+        val attendeeJson = createAttendeeJson().put("email", "a")
+        val registerRequest = MockMvcRequestBuilders.post("/conference/{id}/attendees", conferenceId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(attendeeJson.toString())
+        mvc!!.perform(registerRequest).andExpect(MockMvcResultMatchers.status().isBadRequest)
     }
 
     @Test
-    public void registerDuplicateEmail() throws Exception {
-        Long conferenceId = createConference(createConferenceJson());
-        JSONObject attendeeJson = createAttendeeJson();
-        MockHttpServletRequestBuilder registerRequest = post("/conference/{id}/attendees", conferenceId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(attendeeJson.toString());
-
-        mvc.perform(registerRequest).andExpect(status().isOk());
-        mvc.perform(registerRequest).andExpect(status().isBadRequest());
+    @Throws(Exception::class)
+    fun registerDuplicateEmail() {
+        val conferenceId = createConference(createConferenceJson())
+        val attendeeJson = createAttendeeJson()
+        val registerRequest = MockMvcRequestBuilders.post("/conference/{id}/attendees", conferenceId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(attendeeJson.toString())
+        mvc!!.perform(registerRequest).andExpect(MockMvcResultMatchers.status().isOk)
+        mvc.perform(registerRequest).andExpect(MockMvcResultMatchers.status().isBadRequest)
     }
 
     @Test
-    public void registerMaxAttendeesExceeded() throws Exception {
-        Long conferenceId = createConference(createConferenceJson().put("maxAttendees", 1));
-        MockHttpServletRequestBuilder registerRequest = post("/conference/{id}/attendees", conferenceId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createAttendeeJson().put("email", "test1@konfi.io").toString());
-        mvc.perform(registerRequest).andExpect(status().isOk());
-
-        MockHttpServletRequestBuilder registerRequest2 = post("/conference/{id}/attendees", conferenceId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createAttendeeJson().put("email", "test2@konfi.io").toString());
-        mvc.perform(registerRequest2).andExpect(status().isBadRequest());
+    @Throws(Exception::class)
+    fun registerMaxAttendeesExceeded() {
+        val conferenceId = createConference(createConferenceJson().put("maxAttendees", 1))
+        val registerRequest = MockMvcRequestBuilders.post("/conference/{id}/attendees", conferenceId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(createAttendeeJson().put("email", "test1@konfi.io").toString())
+        mvc!!.perform(registerRequest).andExpect(MockMvcResultMatchers.status().isOk)
+        val registerRequest2 = MockMvcRequestBuilders.post("/conference/{id}/attendees", conferenceId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(createAttendeeJson().put("email", "test2@konfi.io").toString())
+        mvc.perform(registerRequest2).andExpect(MockMvcResultMatchers.status().isBadRequest)
     }
 
     @Test
-    public void deregister() throws Exception {
-        Long conferenceId = createConference(createConferenceJson());
-        JSONObject attendeeJson = createAttendeeJson();
-        MockHttpServletRequestBuilder registerRequest = post("/conference/{id}/attendees", conferenceId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(attendeeJson.toString());
-        MockHttpServletRequestBuilder deregisterRequest = delete("/conference/{id}/attendees", conferenceId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(attendeeJson.toString());
-
-        mvc.perform(registerRequest).andExpect(status().isOk());
-        mvc.perform(deregisterRequest).andExpect(status().isOk());
-        mvc.perform(get("/conference/{id}/attendees", conferenceId))
-                .andExpect(jsonPath("$", hasSize(0)));
+    @Throws(Exception::class)
+    fun deregister() {
+        val conferenceId = createConference(createConferenceJson())
+        val attendeeJson = createAttendeeJson()
+        val registerRequest = MockMvcRequestBuilders.post("/conference/{id}/attendees", conferenceId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(attendeeJson.toString())
+        val deregisterRequest = MockMvcRequestBuilders.delete("/conference/{id}/attendees", conferenceId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(attendeeJson.toString())
+        mvc!!.perform(registerRequest).andExpect(MockMvcResultMatchers.status().isOk)
+        mvc.perform(deregisterRequest).andExpect(MockMvcResultMatchers.status().isOk)
+        mvc.perform(MockMvcRequestBuilders.get("/conference/{id}/attendees", conferenceId))
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize<Any>(0)))
     }
 
-    private Long createConference(JSONObject conferenceJson) throws Exception {
-        MockHttpServletRequestBuilder request = post("/conference")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(conferenceJson.toString());
-
-        String createdConferenceJson = mvc.perform(request).andReturn().getResponse().getContentAsString();
-        return new JSONObject(createdConferenceJson).getLong("id");
+    @Throws(Exception::class)
+    private fun createConference(conferenceJson: JSONObject): Long {
+        val request = MockMvcRequestBuilders.post("/conference")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(conferenceJson.toString())
+        val createdConferenceJson = mvc!!.perform(request).andReturn().response.contentAsString
+        return JSONObject(createdConferenceJson).getLong("id")
     }
 
-    private ResultActions postJson(String path, JSONObject json) throws Exception {
-        return mvc.perform(post(path).contentType(MediaType.APPLICATION_JSON).content(json.toString()));
+    @Throws(Exception::class)
+    private fun postJson(path: String, json: JSONObject): ResultActions {
+        return mvc!!.perform(
+            MockMvcRequestBuilders.post(path).contentType(MediaType.APPLICATION_JSON).content(json.toString())
+        )
     }
 
-    private JSONObject createConferenceJson() throws Exception {
-        return new JSONObject()
-                .put("name", "KotlinKonf")
-                .put("maxAttendees", 200)
-                .put("startDate", "2021-01-03 09:00")
-                .put("endDate", "2021-01-05 18:00");
+    @Throws(Exception::class)
+    private fun createConferenceJson(): JSONObject {
+        return JSONObject()
+            .put("name", "KotlinKonf")
+            .put("maxAttendees", 200)
+            .put("startDate", "2021-01-03 09:00")
+            .put("endDate", "2021-01-05 18:00")
     }
 
-    private JSONObject createAttendeeJson() throws Exception {
-        return new JSONObject()
-                .put("firstName", "Max")
-                .put("lastName", "Mustermann")
-                .put("email", "maxi@konfi.io");
+    @Throws(Exception::class)
+    private fun createAttendeeJson(): JSONObject {
+        return JSONObject()
+            .put("firstName", "Max")
+            .put("lastName", "Mustermann")
+            .put("email", "maxi@konfi.io")
     }
+
 }
