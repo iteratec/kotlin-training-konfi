@@ -9,10 +9,21 @@
 * Maximal number of attendees cannot be exceeded
 * Each attendee may register for a given conference only once
 
+## Project structure
+* Branch `main` contains the 'legacy' Java project.
+* Branch `kotlin` contains migrated and polished Kotlin project.
+* Branch `kotlin` contains also an awesome frontend written in Kotlin/JS!
+
+### Requirements
+* Java 11+
+* *Optional: Node 14 for frontend*
+
 ## Testing & running
 Konfi can be tested and started by executing Gradle tasks:
 * Test with `./gradlew backend:test`
 * Run with `./gradlew backend:bootRun`
+
+To run the frontend in the `kotlin` branch use `./gradlew frontend:browserDevelopmentRun`
 
 ## Access points
 * Backend-Server is running on http://localhost:8080
