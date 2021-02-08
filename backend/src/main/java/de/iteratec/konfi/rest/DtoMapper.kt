@@ -1,46 +1,47 @@
 package de.iteratec.konfi.rest
 
-import de.iteratec.konfi.rest.dto.ConferenceDto
+import de.iteratec.konfi.domain.model.Attendee
 import de.iteratec.konfi.domain.model.Conference
 import de.iteratec.konfi.rest.dto.AttendeeDto
-import de.iteratec.konfi.domain.model.Attendee
+import de.iteratec.konfi.rest.dto.ConferenceDto
 import org.springframework.stereotype.Component
 
 @Component
 class DtoMapper {
     fun toModel(dto: ConferenceDto): Conference {
-        val model = Conference()
-        model.id = dto.id
-        model.name = dto.name
-        model.maxAttendees = dto.maxAttendees
-        model.startDate = dto.startDate
-        model.endDate = dto.endDate
-        return model
+        return Conference().apply {
+            id = dto.id
+            name = dto.name
+            maxAttendees = dto.maxAttendees
+            startDate = dto.startDate
+            endDate = dto.endDate
+        }
     }
 
     fun toDto(model: Conference): ConferenceDto {
-        val dto = ConferenceDto()
-        dto.id = model.id
-        dto.name = model.name
-        dto.maxAttendees = model.maxAttendees
-        dto.startDate = model.startDate
-        dto.endDate = model.endDate
-        return dto
+        return ConferenceDto().apply {
+            id = model.id
+            name = model.name
+            maxAttendees = model.maxAttendees
+            startDate = model.startDate
+            endDate = model.endDate
+        }
     }
 
     fun toModel(dto: AttendeeDto): Attendee {
-        val model = Attendee()
-        model.firstName = dto.firstName
-        model.lastName = dto.lastName
-        model.email = dto.email
-        return model
+        return Attendee().apply {
+            firstName = dto.firstName
+            lastName = dto.lastName
+            email = dto.email
+        }
     }
 
     fun toDto(model: Attendee): AttendeeDto {
-        val dto = AttendeeDto()
-        dto.firstName = model.firstName
-        dto.lastName = model.lastName
-        dto.email = model.email
-        return dto
+        return AttendeeDto().apply {
+            firstName = model.firstName
+            lastName = model.lastName
+            email = model.email
+
+        }
     }
 }
