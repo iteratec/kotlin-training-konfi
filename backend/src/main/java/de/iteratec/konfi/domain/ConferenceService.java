@@ -27,14 +27,14 @@ public class ConferenceService {
         this.mapper = mapper;
     }
 
-    public ConferenceDto get(Long id) {
+    public ConferenceDto findOne(Long id) {
         requireNonNull(id);
 
         Conference conference = repository.getOne(id);
         return mapper.toDto(conference);
     }
 
-    public List<ConferenceDto> getAll() {
+    public List<ConferenceDto> findAll() {
         List<Conference> conferences = repository.findAll();
         return conferences.stream().map(mapper::toDto).collect(Collectors.toList());
     }

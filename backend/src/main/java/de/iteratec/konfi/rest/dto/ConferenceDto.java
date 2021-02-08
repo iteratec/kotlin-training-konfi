@@ -1,5 +1,9 @@
 package de.iteratec.konfi.rest.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiParam;
+
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -7,20 +11,28 @@ import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 public class ConferenceDto {
+    
     private Long id;
 
     @NotNull
     @Size(min = 3, max = 20)
+    @ApiModelProperty(example = "KotlinKonf", required = true)
     private String name;
 
     @NotNull
     @Positive
+    @ApiParam(example = "200")
+    @ApiModelProperty(example = "200", required = true)
     private int maxAttendees;
 
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    @ApiModelProperty(example = "2022-06-04 09:00", required = true)
     private LocalDateTime startDate;
 
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    @ApiModelProperty(example = "2022-06-06 15:00", required = true)
     private LocalDateTime endDate;
 
     public Long getId() {

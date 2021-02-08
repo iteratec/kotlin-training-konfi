@@ -51,7 +51,7 @@ public class KonfiTest {
         postJson("/conference", json.put("maxAttendees", null)).andExpect(status().isBadRequest());
         postJson("/conference", json.put("maxAttendees", -1)).andExpect(status().isBadRequest());
         postJson("/conference", json.put("startDate", null)).andExpect(status().isBadRequest());
-        postJson("/conference", json.put("startDate", "1970-01-03T09:00:00")).andExpect(status().isBadRequest());
+        postJson("/conference", json.put("startDate", "1970-01-03 09:00:00")).andExpect(status().isBadRequest());
         postJson("/conference", json.put("endDate", null)).andExpect(status().isBadRequest());
     }
 
@@ -149,8 +149,8 @@ public class KonfiTest {
         return new JSONObject()
                 .put("name", "KotlinKonf")
                 .put("maxAttendees", 200)
-                .put("startDate", "2021-01-03T09:00:00")
-                .put("endDate", "2021-01-05T18:00:00");
+                .put("startDate", "2021-01-03 09:00")
+                .put("endDate", "2021-01-05 18:00");
     }
 
     private JSONObject createAttendeeJson() throws Exception {

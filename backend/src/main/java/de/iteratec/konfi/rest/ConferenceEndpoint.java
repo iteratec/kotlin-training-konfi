@@ -23,14 +23,14 @@ public class ConferenceEndpoint {
 
     @GetMapping
     @ApiOperation(value = "List all conferences")
-    public List<ConferenceDto> getAll() {
-        return conferenceService.getAll();
+    public List<ConferenceDto> findAll() {
+        return conferenceService.findAll();
     }
 
     @GetMapping("/{id}")
     @ApiOperation(value = "Get a single conference")
-    public ConferenceDto get(@PathVariable Long id) {
-        return conferenceService.get(id);
+    public ConferenceDto findOne(@PathVariable Long id) {
+        return conferenceService.findOne(id);
     }
 
     @PostMapping
