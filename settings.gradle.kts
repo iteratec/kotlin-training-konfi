@@ -1,5 +1,5 @@
 rootProject.name = "konfi"
-include("backend")
+include("backend", "frontend")
 
 pluginManagement {
     repositories {
