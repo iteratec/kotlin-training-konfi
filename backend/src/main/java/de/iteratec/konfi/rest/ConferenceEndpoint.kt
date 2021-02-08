@@ -1,12 +1,12 @@
 package de.iteratec.konfi.rest
 
 import de.iteratec.konfi.domain.ConferenceService
-import io.swagger.annotations.ApiOperation
-import de.iteratec.konfi.rest.dto.ConferenceDto
-import javax.validation.Valid
 import de.iteratec.konfi.rest.dto.AttendeeDto
+import de.iteratec.konfi.rest.dto.ConferenceDto
 import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
 import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("/conference")
@@ -26,7 +26,7 @@ class ConferenceEndpoint(private val conferenceService: ConferenceService) {
 
     @PostMapping
     @ApiOperation(value = "Create a new conference")
-    fun create(@RequestBody dto: @Valid ConferenceDto?): ConferenceDto {
+    fun create(@Valid @RequestBody dto: ConferenceDto?): ConferenceDto {
         return conferenceService.create(dto)
     }
 
@@ -44,13 +44,13 @@ class ConferenceEndpoint(private val conferenceService: ConferenceService) {
 
     @PostMapping("/{id}/attendees")
     @ApiOperation(value = "Register a new attendee")
-    fun register(@PathVariable id: Long?, @RequestBody attendee: @Valid AttendeeDto?) {
+    fun register(@PathVariable id: Long?, @Valid @RequestBody attendee: AttendeeDto?) {
         conferenceService.register(id, attendee)
     }
 
     @DeleteMapping("/{id}/attendees")
     @ApiOperation(value = "Remove an existing attendee")
-    fun deregister(@PathVariable id: Long?, @RequestBody attendee: @Valid AttendeeDto?) {
+    fun deregister(@PathVariable id: Long?, @Valid @RequestBody attendee: AttendeeDto?) {
         conferenceService.deregister(id, attendee)
     }
 }
