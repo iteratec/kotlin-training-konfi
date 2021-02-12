@@ -20,7 +20,7 @@ class ConferenceEndpoint(private val conferenceService: ConferenceService) {
 
     @GetMapping("/{id}")
     @ApiOperation(value = "Get a single conference")
-    fun findOne(@PathVariable id: Long?): ConferenceDto {
+    fun findOne(@PathVariable id: Long): ConferenceDto {
         return conferenceService.findOne(id)
     }
 
@@ -32,25 +32,25 @@ class ConferenceEndpoint(private val conferenceService: ConferenceService) {
 
     @DeleteMapping("/{id}")
     @ApiOperation(value = "Delete an existing conference")
-    fun delete(@PathVariable id: Long?) {
+    fun delete(@PathVariable id: Long) {
         conferenceService.delete(id)
     }
 
     @GetMapping("/{id}/attendees")
     @ApiOperation(value = "Get a list of conference's attendees")
-    fun getAttendees(@PathVariable id: Long?): List<AttendeeDto> {
+    fun getAttendees(@PathVariable id: Long): List<AttendeeDto> {
         return conferenceService.getAttendees(id)
     }
 
     @PostMapping("/{id}/attendees")
     @ApiOperation(value = "Register a new attendee")
-    fun register(@PathVariable id: Long?, @Valid @RequestBody attendee: AttendeeDto?) {
+    fun register(@PathVariable id: Long, @Valid @RequestBody attendee: AttendeeDto?) {
         conferenceService.register(id, attendee)
     }
 
     @DeleteMapping("/{id}/attendees")
     @ApiOperation(value = "Remove an existing attendee")
-    fun deregister(@PathVariable id: Long?, @Valid @RequestBody attendee: AttendeeDto?) {
+    fun deregister(@PathVariable id: Long, @Valid @RequestBody attendee: AttendeeDto?) {
         conferenceService.deregister(id, attendee)
     }
 }

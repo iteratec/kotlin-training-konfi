@@ -1,110 +1,94 @@
-package de.iteratec.konfi.domain;
+package de.iteratec.konfi.domain
 
-import de.iteratec.konfi.rest.dto.AttendeeDto;
-import de.iteratec.konfi.rest.dto.ConferenceDto;
-import de.iteratec.konfi.domain.model.ConferenceCollisionException;
-import de.iteratec.konfi.domain.model.RegisterAttendeeException;
-import de.iteratec.konfi.domain.model.Attendee;
-import de.iteratec.konfi.domain.model.Conference;
-import de.iteratec.konfi.rest.DtoMapper;
-import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import static java.util.Objects.requireNonNull;
+import de.iteratec.konfi.domain.model.Attendee
+import de.iteratec.konfi.domain.model.Conference
+import de.iteratec.konfi.domain.model.ConferenceCollisionException
+import de.iteratec.konfi.domain.model.RegisterAttendeeException
+import de.iteratec.konfi.rest.DtoMapper
+import de.iteratec.konfi.rest.dto.AttendeeDto
+import de.iteratec.konfi.rest.dto.ConferenceDto
+import org.springframework.stereotype.Service
+import java.util.*
+import java.util.stream.Collectors
+import javax.transaction.Transactional
 
 @Service
-public class ConferenceService {
-
-    private final ConferenceRepository repository;
-    private final DtoMapper mapper;
-
-    public ConferenceService(ConferenceRepository repository, DtoMapper mapper) {
-        this.repository = repository;
-        this.mapper = mapper;
+class ConferenceService(private val repository: ConferenceRepository, private val mapper: DtoMapper) {
+    fun findOne(id: Long): ConferenceDto {
+        Objects.requireNonNull(id)
+        val conference = repository.getOne(id)
+        return mapper.toDto(conference)
     }
 
-    public ConferenceDto findOne(Long id) {
-        requireNonNull(id);
-
-        Conference conference = repository.getOne(id);
-        return mapper.toDto(conference);
-    }
-
-    public List<ConferenceDto> findAll() {
-        List<Conference> conferences = repository.findAll();
-        return conferences.stream().map(mapper::toDto).collect(Collectors.toList());
+    fun findAll(): List<ConferenceDto> {
+        val conferences = repository.findAll()
+        return conferences.stream().map { model: Conference? ->
+            mapper.toDto(
+                model!!
+            )
+        }.collect(Collectors.toList())
     }
 
     @Transactional
-    public ConferenceDto create(ConferenceDto dto) {
-        requireNonNull(dto);
-
-        Conference conference = mapper.toModel(dto);
-        List<Conference> collidingConferences = findCollidingConferences(conference);
+    fun create(dto: ConferenceDto?): ConferenceDto {
+        Objects.requireNonNull(dto)
+        val conference = mapper.toModel(dto!!)
+        val collidingConferences = findCollidingConferences(conference)
         if (!collidingConferences.isEmpty()) {
-            throw new ConferenceCollisionException();
+            throw ConferenceCollisionException()
         }
-
-        Conference savedConference = repository.save(conference);
-        return mapper.toDto(savedConference);
+        val savedConference = repository.save(conference)
+        return mapper.toDto(savedConference)
     }
 
     @Transactional
-    public void delete(Long id) {
-        requireNonNull(id);
-        repository.deleteById(id);
+    fun delete(id: Long) {
+        Objects.requireNonNull(id)
+        repository.deleteById(id)
     }
 
-    public List<AttendeeDto> getAttendees(Long id) {
-        requireNonNull(id);
-
-        Conference conference = repository.getOne(id);
-        return conference.getAttendees().stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+    fun getAttendees(id: Long): List<AttendeeDto> {
+        Objects.requireNonNull(id)
+        val (_, _, _, _, _, attendees) = repository.getOne(id)
+        return attendees.stream()
+            .map { model: Attendee? -> mapper.toDto(model!!) }
+            .collect(Collectors.toList())
     }
 
     @Transactional
-    public void register(Long id, AttendeeDto attendeeDto) {
-        requireNonNull(id);
-        requireNonNull(attendeeDto);
-
-        Attendee attendee = mapper.toModel(attendeeDto);
-        Conference conference = repository.getOne(id);
-
-        if (conference.getAttendees().size() == conference.getMaxAttendees()) {
-            throw new RegisterAttendeeException("The conference is full");
+    fun register(id: Long, attendeeDto: AttendeeDto?) {
+        Objects.requireNonNull(id)
+        Objects.requireNonNull(attendeeDto)
+        val attendee = mapper.toModel(attendeeDto!!)
+        val conference = repository.getOne(id)
+        if (conference.attendees.size == conference.maxAttendees) {
+            throw RegisterAttendeeException("The conference is full")
         }
         if (isAlreadyRegistered(attendee, conference)) {
-            throw new RegisterAttendeeException("The attendee is already registered for this conference");
+            throw RegisterAttendeeException("The attendee is already registered for this conference")
         }
-
-        conference.getAttendees().add(attendee);
-        repository.save(conference);
+        conference.attendees.add(attendee)
+        repository.save(conference)
     }
 
     @Transactional
-    public void deregister(Long id, AttendeeDto attendeeDto) {
-        requireNonNull(id);
-        requireNonNull(attendeeDto);
-
-        Attendee attendee = mapper.toModel(attendeeDto);
-        Conference conference = repository.getOne(id);
-        conference.getAttendees().removeIf(a -> a.getEmail().equalsIgnoreCase(attendee.getEmail()));
-        repository.save(conference);
+    fun deregister(id: Long, attendeeDto: AttendeeDto?) {
+        Objects.requireNonNull(id)
+        Objects.requireNonNull(attendeeDto)
+        val (_, _, email) = mapper.toModel(attendeeDto!!)
+        val conference = repository.getOne(id)
+        conference.attendees.removeIf { (_, _, email1) -> email1.equals(email, ignoreCase = true) }
+        repository.save(conference)
     }
 
-    private List<Conference> findCollidingConferences(Conference conference) {
-        return repository.findByName(conference.getName()).stream()
-                .filter(c -> c.collidesWith(conference))
-                .collect(Collectors.toList());
+    private fun findCollidingConferences(conference: Conference): List<Conference> {
+        return repository.findByName(conference.name).stream()
+            .filter { c: Conference -> c.collidesWith(conference) }
+            .collect(Collectors.toList())
     }
 
-    private boolean isAlreadyRegistered(Attendee attendee, Conference conference) {
-        return conference.getAttendees().stream().anyMatch(a -> a.getEmail().equalsIgnoreCase(attendee.getEmail()));
+    private fun isAlreadyRegistered(attendee: Attendee, conference: Conference): Boolean {
+        return conference.attendees.stream()
+            .anyMatch { (_, _, email) -> email.equals(attendee.email, ignoreCase = true) }
     }
 }
