@@ -5,15 +5,15 @@ import javax.validation.constraints.Email
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
-class AttendeeDto {
-    @ApiModelProperty(example = "Max")
-    var firstName: @Size(min = 2, max = 32) String? = null
+data class AttendeeDto(
+    @field:ApiModelProperty(example = "Max")
+    val firstName: @Size(min = 2, max = 32) String,
 
-    @ApiModelProperty(example = "Mustermann")
-    var lastName: @Size(min = 2, max = 64) String? = null
+    @field:ApiModelProperty(example = "Mustermann")
+    val lastName: @Size(min = 2, max = 64) String,
 
-    @NotNull
-    @Email
-    @ApiModelProperty(example = "maxi@i-love-kotlin.io", required = true)
-    var email: String? = null
-}
+    @field:NotNull
+    @field:Email
+    @field:ApiModelProperty(example = "maxi@i-love-kotlin.io", required = true)
+    val email: String,
+)
