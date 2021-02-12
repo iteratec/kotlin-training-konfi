@@ -8,7 +8,6 @@ import de.iteratec.konfi.rest.DtoMapper
 import de.iteratec.konfi.rest.dto.AttendeeDto
 import de.iteratec.konfi.rest.dto.ConferenceDto
 import org.springframework.stereotype.Service
-import java.util.stream.Collectors
 import javax.transaction.Transactional
 
 @Service
@@ -19,12 +18,7 @@ class ConferenceService(private val repository: ConferenceRepository, private va
     }
 
     fun findAll(): List<ConferenceDto> {
-        val conferences = repository.findAll()
-        return conferences.stream().map { model: Conference? ->
-            mapper.toDto(
-                model!!
-            )
-        }.collect(Collectors.toList())
+        return repository.findAll().map { mapper.toDto(it) }
     }
 
     @Transactional
@@ -44,10 +38,7 @@ class ConferenceService(private val repository: ConferenceRepository, private va
     }
 
     fun getAttendees(id: Long): List<AttendeeDto> {
-        val (_, _, _, _, _, attendees) = repository.getOne(id)
-        return attendees.stream()
-            .map { model: Attendee? -> mapper.toDto(model!!) }
-            .collect(Collectors.toList())
+        return repository.getOne(id).attendees.map { mapper.toDto(it) }
     }
 
     @Transactional
@@ -66,20 +57,18 @@ class ConferenceService(private val repository: ConferenceRepository, private va
 
     @Transactional
     fun deregister(id: Long, attendeeDto: AttendeeDto) {
-        val (_, _, email) = mapper.toModel(attendeeDto)
+        val email = mapper.toModel(attendeeDto).email
         val conference = repository.getOne(id)
-        conference.attendees.removeIf { (_, _, email1) -> email1.equals(email, ignoreCase = true) }
+        conference.attendees.removeIf { attendee -> attendee.email.equals(email, ignoreCase = true) }
         repository.save(conference)
     }
 
     private fun findCollidingConferences(conference: Conference): List<Conference> {
-        return repository.findByName(conference.name).stream()
-            .filter { c: Conference -> c.collidesWith(conference) }
-            .collect(Collectors.toList())
+        return repository.findByName(conference.name).filter { it.collidesWith(conference) }
     }
 
     private fun isAlreadyRegistered(attendee: Attendee, conference: Conference): Boolean {
-        return conference.attendees.stream()
-            .anyMatch { (_, _, email) -> email.equals(attendee.email, ignoreCase = true) }
+        return conference.attendees
+            .any { it.email.equals(attendee.email, ignoreCase = true) }
     }
 }
