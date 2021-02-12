@@ -5,6 +5,7 @@ import client.model.Conference
 import client.model.Response
 import kotlinx.browser.window
 import kotlinx.coroutines.await
+import kotlinx.serialization.decodeFromString
 import kotlin.js.Date
 import kotlin.js.Json
 
@@ -29,16 +30,9 @@ object BackendClient {
     }
 
     suspend fun getAttendees(conferenceId: Long): Response<List<Attendee>> = Response {
-        window
+        val json = window
             .fetch("$baseUrl/conference/$conferenceId/attendees").await()
-            .json().await()
-            .unsafeCast<Array<Json>>()
-            .map {
-                Attendee(
-                    email = it["email"] as String,
-                    firstName = it["firstName"] as String,
-                    lastName = it["lastName"] as String
-                )
-            }
+            .text().await()
+        kotlinx.serialization.json.Json.decodeFromString(json)
     }
 }
