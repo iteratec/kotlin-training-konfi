@@ -1,24 +1,24 @@
 package de.iteratec.konfi.domain.model
 
 import java.time.LocalDateTime
-import java.util.*
 import javax.persistence.*
 
 @Entity
 data class Conference(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
-    var name: String? = null,
-    var maxAttendees: Int = 0,
-    var startDate: LocalDateTime? = null,
-    var endDate: LocalDateTime? = null,
+    val id: Long?,
+    val name: String,
+    val maxAttendees: Int,
+    val startDate: LocalDateTime,
+    val endDate: LocalDateTime,
+    // TODO: it seems hibernate requires a mutable list here, so we can't use listOf() or emptyList()
     @ElementCollection
-    var attendees: List<Attendee> = ArrayList(),
+    val attendees: MutableList<Attendee> = ArrayList(),
 ) {
 
     fun collidesWith(other: Conference): Boolean {
-        return other.endDate!!.compareTo(startDate) >= 0 && other.startDate!!.compareTo(endDate) <= 0
+        return other.endDate >= startDate && other.startDate <= endDate
     }
 
 }

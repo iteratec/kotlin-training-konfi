@@ -9,13 +9,13 @@ import org.springframework.stereotype.Component
 @Component
 class DtoMapper {
     fun toModel(dto: ConferenceDto): Conference {
-        return Conference().apply {
-            id = dto.id
-            name = dto.name
-            maxAttendees = dto.maxAttendees
-            startDate = dto.startDate
-            endDate = dto.endDate
-        }
+        return Conference(
+            id = dto.id,
+            name = dto.name,
+            maxAttendees = dto.maxAttendees,
+            startDate = dto.startDate,
+            endDate = dto.endDate,
+        )
     }
 
     fun toDto(model: Conference): ConferenceDto {
