@@ -8,14 +8,12 @@ import de.iteratec.konfi.rest.DtoMapper
 import de.iteratec.konfi.rest.dto.AttendeeDto
 import de.iteratec.konfi.rest.dto.ConferenceDto
 import org.springframework.stereotype.Service
-import java.util.*
 import java.util.stream.Collectors
 import javax.transaction.Transactional
 
 @Service
 class ConferenceService(private val repository: ConferenceRepository, private val mapper: DtoMapper) {
     fun findOne(id: Long): ConferenceDto {
-        Objects.requireNonNull(id)
         val conference = repository.getOne(id)
         return mapper.toDto(conference)
     }
@@ -30,11 +28,10 @@ class ConferenceService(private val repository: ConferenceRepository, private va
     }
 
     @Transactional
-    fun create(dto: ConferenceDto?): ConferenceDto {
-        Objects.requireNonNull(dto)
-        val conference = mapper.toModel(dto!!)
+    fun create(dto: ConferenceDto): ConferenceDto {
+        val conference = mapper.toModel(dto)
         val collidingConferences = findCollidingConferences(conference)
-        if (!collidingConferences.isEmpty()) {
+        if (collidingConferences.isNotEmpty()) {
             throw ConferenceCollisionException()
         }
         val savedConference = repository.save(conference)
@@ -43,12 +40,10 @@ class ConferenceService(private val repository: ConferenceRepository, private va
 
     @Transactional
     fun delete(id: Long) {
-        Objects.requireNonNull(id)
         repository.deleteById(id)
     }
 
     fun getAttendees(id: Long): List<AttendeeDto> {
-        Objects.requireNonNull(id)
         val (_, _, _, _, _, attendees) = repository.getOne(id)
         return attendees.stream()
             .map { model: Attendee? -> mapper.toDto(model!!) }
@@ -56,10 +51,8 @@ class ConferenceService(private val repository: ConferenceRepository, private va
     }
 
     @Transactional
-    fun register(id: Long, attendeeDto: AttendeeDto?) {
-        Objects.requireNonNull(id)
-        Objects.requireNonNull(attendeeDto)
-        val attendee = mapper.toModel(attendeeDto!!)
+    fun register(id: Long, attendeeDto: AttendeeDto) {
+        val attendee = mapper.toModel(attendeeDto)
         val conference = repository.getOne(id)
         if (conference.attendees.size == conference.maxAttendees) {
             throw RegisterAttendeeException("The conference is full")
@@ -72,10 +65,8 @@ class ConferenceService(private val repository: ConferenceRepository, private va
     }
 
     @Transactional
-    fun deregister(id: Long, attendeeDto: AttendeeDto?) {
-        Objects.requireNonNull(id)
-        Objects.requireNonNull(attendeeDto)
-        val (_, _, email) = mapper.toModel(attendeeDto!!)
+    fun deregister(id: Long, attendeeDto: AttendeeDto) {
+        val (_, _, email) = mapper.toModel(attendeeDto)
         val conference = repository.getOne(id)
         conference.attendees.removeIf { (_, _, email1) -> email1.equals(email, ignoreCase = true) }
         repository.save(conference)

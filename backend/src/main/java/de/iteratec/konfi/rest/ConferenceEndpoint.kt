@@ -26,7 +26,7 @@ class ConferenceEndpoint(private val conferenceService: ConferenceService) {
 
     @PostMapping
     @ApiOperation(value = "Create a new conference")
-    fun create(@Valid @RequestBody dto: ConferenceDto?): ConferenceDto {
+    fun create(@Valid @RequestBody dto: ConferenceDto): ConferenceDto {
         return conferenceService.create(dto)
     }
 
@@ -44,13 +44,13 @@ class ConferenceEndpoint(private val conferenceService: ConferenceService) {
 
     @PostMapping("/{id}/attendees")
     @ApiOperation(value = "Register a new attendee")
-    fun register(@PathVariable id: Long, @Valid @RequestBody attendee: AttendeeDto?) {
+    fun register(@PathVariable id: Long, @Valid @RequestBody attendee: AttendeeDto) {
         conferenceService.register(id, attendee)
     }
 
     @DeleteMapping("/{id}/attendees")
     @ApiOperation(value = "Remove an existing attendee")
-    fun deregister(@PathVariable id: Long, @Valid @RequestBody attendee: AttendeeDto?) {
+    fun deregister(@PathVariable id: Long, @Valid @RequestBody attendee: AttendeeDto) {
         conferenceService.deregister(id, attendee)
     }
 }
