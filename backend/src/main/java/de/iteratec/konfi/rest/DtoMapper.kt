@@ -11,10 +11,10 @@ class DtoMapper {
     fun toModel(dto: ConferenceDto): Conference {
         return Conference(
             id = dto.id,
-            name = dto.name,
+            name = dto.name!!,
             maxAttendees = dto.maxAttendees,
-            startDate = dto.startDate,
-            endDate = dto.endDate,
+            startDate = dto.startDate!!,
+            endDate = dto.endDate!!,
         )
     }
 
