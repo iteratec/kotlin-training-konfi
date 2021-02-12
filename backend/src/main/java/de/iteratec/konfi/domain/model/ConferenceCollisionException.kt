@@ -1,4 +1,3 @@
-package de.iteratec.konfi.domain.model;
+package de.iteratec.konfi.domain.model
 
-public class ConferenceCollisionException extends RuntimeException {
-}
+class ConferenceCollisionException : RuntimeException()

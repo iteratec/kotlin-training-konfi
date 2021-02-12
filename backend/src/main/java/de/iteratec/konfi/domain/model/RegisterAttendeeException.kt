@@ -1,8 +1,3 @@
-package de.iteratec.konfi.domain.model;
+package de.iteratec.konfi.domain.model
 
-public class RegisterAttendeeException extends RuntimeException {
-
-    public RegisterAttendeeException(String message) {
-        super(message);
-    }
-}
+class RegisterAttendeeException(message: String) : RuntimeException(message)
