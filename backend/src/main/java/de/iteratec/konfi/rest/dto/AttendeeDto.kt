@@ -1,47 +1,19 @@
-package de.iteratec.konfi.rest.dto;
+package de.iteratec.konfi.rest.dto
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiModelProperty
+import javax.validation.constraints.Email
+import javax.validation.constraints.NotNull
+import javax.validation.constraints.Size
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-public class AttendeeDto {
-
-    @Size(min = 2, max = 32)
+class AttendeeDto {
     @ApiModelProperty(example = "Max")
-    private String firstName;
+    var firstName: @Size(min = 2, max = 32) String? = null
 
-    @Size(min = 2, max = 64)
     @ApiModelProperty(example = "Mustermann")
-    private String lastName;
+    var lastName: @Size(min = 2, max = 64) String? = null
 
     @NotNull
     @Email
     @ApiModelProperty(example = "maxi@i-love-kotlin.io", required = true)
-    private String email;
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    var email: String? = null
 }
