@@ -29,11 +29,11 @@ class DtoMapper {
     }
 
     fun toModel(dto: AttendeeDto): Attendee {
-        return Attendee().apply {
-            firstName = dto.firstName
-            lastName = dto.lastName
+        return Attendee(
+            firstName = dto.firstName,
+            lastName = dto.lastName,
             email = dto.email
-        }
+        )
     }
 
     fun toDto(model: Attendee): AttendeeDto {
