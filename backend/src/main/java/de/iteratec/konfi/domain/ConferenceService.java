@@ -46,7 +46,7 @@ public class ConferenceService {
         Conference conference = mapper.toModel(dto);
         List<Conference> collidingConferences = findCollidingConferences(conference);
         if (!collidingConferences.isEmpty()) {
-            throw new ConferenceCollisionException();
+            throw new ConferenceCollisionException("Other conference for this date invertal exists already");
         }
 
         Conference savedConference = repository.save(conference);
