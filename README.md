@@ -10,9 +10,9 @@
 * Each attendee may register for a given conference only once
 
 ## Project structure
-* Branch `main` contains the 'legacy' Java project.
-* Branch `kotlin` contains migrated and polished Kotlin project.
-* Branch `kotlin` contains also an awesome frontend written in Kotlin/JS!
+* Module `backend` contains the 'legacy' Java backend.
+* Module `solution-backend` contains migrated and polished Kotlin project.
+* Module `solution-frontend` contains an awesome frontend written in Kotlin/JS!
 
 ### Requirements
 * Java 11+
