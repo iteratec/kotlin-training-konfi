@@ -101,6 +101,7 @@ public class ConferenceService {
     private List<Conference> findCollidingConferences(Conference conference) {
         return repository.findByName(conference.getName()).stream()
                 .filter(c -> c.collidesWith(conference))
+                .filter(c -> !c.getId().equals(conference.getId()))
                 .collect(Collectors.toList());
     }
 

@@ -1,0 +1,43 @@
+###
+GET http://localhost:8080/conference
+
+###
+POST http://localhost:8080/conference
+Content-Type: application/json
+
+{
+    "endDate": "2022-06-06 15:00",
+    "id": 1,
+    "maxAttendees": 200,
+    "name": "KotlinKonf",
+    "startDate": "2022-06-04 09:00"
+}
+
+###
+GET http://localhost:8080/conference/1
+
+###
+DELETE http://localhost:8080/conference/1
+
+###
+GET http://localhost:8080/conference/1/attendees
+
+###
+POST http://localhost:8080/conference/1/attendees
+Content-Type: application/json
+
+{
+  "email": "maxi@i-love-kotlin.io",
+  "firstName": "Max",
+  "lastName": "Mustermann"
+}
+
+###
+DELETE http://localhost:8080/conference/1/attendees
+Content-Type: application/json
+
+{
+  "email": "maxi@i-love-kotlin.io",
+  "firstName": "Max",
+  "lastName": "Mustermann"
+}

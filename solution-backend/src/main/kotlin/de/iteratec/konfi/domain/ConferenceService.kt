@@ -70,7 +70,9 @@ class ConferenceService(
     }
 
     private fun findCollidingConferences(conference: Conference): List<Conference> {
-        return repository.findByName(conference.name).filter { it.collidesWith(conference) }
+        return repository.findByName(conference.name)
+            .filter { it.collidesWith(conference) }
+            .filter { it.id != conference.id }
     }
 
     private fun isAlreadyRegistered(attendee: Attendee, conference: Conference): Boolean {
